@@ -19,20 +19,6 @@ public:
 		launch();
 	}
 
-	void sizeControl()
-	{
-		delete _stack;
-		_index = -1;
-		system("cls");
-		std::cout << "\n\n STACK IMPLEMENTATION - C++ \n";
-		std::cout << "\n @SQ\n";
-		system("color 0a");
-		std::cout << "\n Enter your desired stack size: ";
-		std::cin >> _size;
-		_stack = new char[_size];
-		stackFunctions();
-	}
-
 	void launch()
 	{
 		system("cls");
@@ -66,6 +52,20 @@ public:
 		}
 	}
 
+	void sizeControl()
+	{
+		delete _stack;
+		_index = -1;
+		system("cls");
+		std::cout << "\n\n STACK IMPLEMENTATION - C++ \n";
+		std::cout << "\n @SQ\n";
+		system("color 0a");
+		std::cout << "\n Enter your desired stack size: ";
+		std::cin >> _size;
+		_stack = new char[_size];
+		stackFunctions();
+	}
+	
 	void stackFunctions()
 	{
 		system("cls");
