@@ -10,9 +10,9 @@ class Stack
 {
 public:
 	char* _stack;
-	// int* _indexArray;
 	int _size;
 	int _index;
+	char _stackTop;
 
 	Stack() : _index(-1), _size(0)
 	{
@@ -37,11 +37,11 @@ public:
 	{
 		system("cls");
 		system("color 0a");
-		std::cout << "\n\n EXPRESSION VALIDITY ANALYZER - C++ \n";
+		std::cout << "\n\n STACK-BASED ALGEBRAIC EXPRESSION ANALYZER - C++ \n";
 		std::cout << "\n @SQ\n";
 		std::cout << "\n Press 1 - 3: \n"
 			<< "\n 1 - Stack Operations"
-			<< "\n 2 - Expression validity check"
+			<< "\n 2 - Expression validity check & Postfix Conversion"
 			<< "\n 3 - Exit\n ";
 
 		char choice = _getch();
@@ -119,8 +119,8 @@ public:
 			stackFunctions();
 		}
 
-		_stack[++_index] = x;
-		std::cout << "\n '" << x << "'pushed to stack. ";
+		_stackTop = _stack[++_index] = x;
+		std::cout << "\n '" << x << "' pushed to stack. ";
 	}
 
 	char pop()
@@ -133,10 +133,15 @@ public:
 		}
 
 		char popped = _stack[_index];
-		_stack[_index--] = -1;
-
+		_stack[_index--] = '0';
+		_stackTop = _stack[_index];
 		std::cout << "\n '" << popped << "' popped from stack.";
 		return popped;
+	}
+
+	char peek()
+	{
+		return _stackTop;
 	}
 
 	void expressionValidityCheck()
@@ -145,16 +150,40 @@ public:
 		system("color 0a");
 		std::cout << "\n\n ALEBRAIC EXPRESSION VALIDITY ANALYSIS - C++ \n";
 		std::cout << "\n @SQ\n";
-		std::cin.clear();
-		std::string expression;
+	/*	std::cin.clear();
+		std::string expression;*/
+
+		char* expression = new char[100];
 		std::cout << "\n Enter the expression to test:\n ";
-		std::getline(std::cin, expression);
+		/*std::getline(std::cin, expression);*/
+
+		// #The _getch() input loop
+		int i = 0;
+		char c = _getch();
+		while (c != 13)
+		{
+			if (c == 8)  // Allow Backspace for erasing characters
+			{
+				if (i == 0);  // Do nothing
+				else
+				{
+					expression[--i] = '\0';
+					std::cout << "\b \b";
+				}
+			}
+			else
+			{
+				expression[i++] = c;
+				std::cout << c;
+			}
+			c = _getch();
+		}
+		expression[i] = '\0';
 
 		delete _stack;
 		_index = -1;
-		_size = expression.size();
+		_size = i;
 		_stack = new char[_size];
-		// _indexArray = new int[_size];
 
 		for (int i = 0; i < _size; ++i)
 		{
@@ -171,11 +200,9 @@ public:
 		{
 			if (isOpeningBrace(expression[i]))
 				push(expression[i]);
-				
+
 			else if (isClosingBrace(expression[i]) and !isEmpty())
 			{
-				//if (!isCorrespondingOpeningBrace(expression[i], _stack[_indexArray[j]]))
-
 				if (!isCorrespondingOpeningBrace(expression[i], _stack[_index]))
 				{
 					std::cout << "\n\n Entered expression was: \n " << expression;
@@ -186,7 +213,7 @@ public:
 				else
 					pop();
 			}
-				
+
 			else if (isClosingBrace(expression[i]) and isEmpty())
 			{
 				std::cout << "\n\n Entered expression was: \n " << expression;
@@ -201,8 +228,28 @@ public:
 
 		if (isEmpty())
 		{
-			std::cout << "\n\n ### This is a valid expression. ###";
-			_getch();
+			time:
+			std::cout << "\n\n ### This is a valid expression. ###\n\n";
+			std::cout << "\n Press 1-2: \n"
+				<< "\n 1 - Proceed to convert this expression to postfix notation"
+				<< "\n 2 - Go to Main Menu";
+			char choice = _getch();
+			switch (choice)
+			{
+			case '1':
+				convertToPostFix(expression, _size);
+				break;
+
+			case '2':
+				launch();
+				break;
+				
+			default:
+				std::cout << "\n Press 1-2 Only! ";
+				Sleep(1000);
+				goto time;
+			}
+
 			launch();
 		}
 		else
@@ -211,6 +258,69 @@ public:
 			_getch();
 			launch();
 		}
+		_getch();
+	}
+
+	void convertToPostFix(char* expression, int size)
+	{
+		system("cls");
+		system("color 0a");
+		std::cout << "\n\n Convert Infix to PostFix Notation - C++ \n";
+		std::cout << "\n @SQ\n";
+		std::cout << "\n";
+
+		// Delete any current stack in memory
+		delete _stack;
+		_index = -1;
+		_size = size;
+		_stack = new char[_size];
+		char* postFix = new char[_size];
+
+		// The beautiful part
+		int j = 0;
+		for (int i = 0; i < _size; ++i)
+		{
+			if (isOpeningBrace(expression[i]))
+				push(expression[i]);
+
+			else if (isalnum(expression[i]))
+				postFix[j++] = expression[i];
+
+			else if (isOperator(expression[i]))
+			{
+				while (precedenceOf(_stackTop) >= precedenceOf(expression[i]) and !isEmpty())
+					if (!isOpeningBrace(_stackTop))
+						postFix[j++] = pop();
+					else
+						pop();  
+
+				push(expression[i]);
+			}
+
+			else if (isClosingBrace(expression[i]) and !isEmpty())
+			{
+				while (_stackTop != correspondingOpeningBracket(expression[i]) and !isEmpty())
+					postFix[j++] = pop();
+				pop();         // Pop the last opening bracket from the _stack
+			}
+		}
+
+		while (!isEmpty())
+			postFix[j++] = pop();       // append any remaining operators/literals to the postFix
+
+		postFix[j] = '\0';             // Null-Terminate the postFix char* array
+
+		std::cout << "\n\n Entered expression was: \n " << expression;
+		std::cout << "\n\n Post Fix Expression:\n\n ";
+
+		for (int i = 0; i < size + 2; ++i)
+			std::cout << "-";
+
+		std::cout << "\n " << postFix << "\n ";
+
+		for (int i = 0; i < size + 2; ++i)
+			std::cout << "-";
+
 		_getch();
 	}
 
@@ -234,9 +344,14 @@ public:
 		return x == '}' or x == ']' or x == ')';
 	}
 
+	static bool isOperator(char x)
+	{
+		return x == '+' or x == '-' or x == '*' or x == '/';
+	}
+
 	static bool isValid(char x)
 	{
-		return isalpha(x) or x == '+' or x == '-' or x == '*' or x == '/' or x == '!' or x == '<' or x == '>' or x == '.';	
+		return isalpha(x) or x == '+' or x == '-' or x == '*' or x == '/'; // or x == '!' or x == '<' or x == '>' or x == '.';
 	}
 
 	static bool isCorrespondingOpeningBrace(char test, char corresponding)
@@ -249,5 +364,48 @@ public:
 			return true;
 		else
 			return false;
+	}
+
+	static int precedenceOf(char op)
+	{
+		switch (op)
+		{
+		case '(':
+		case '[':
+		case '{':
+			return 0;
+			break;
+
+		case '+':
+		case '-':
+			return 1;
+			break;
+
+		case '*':
+		case '/':
+			return 2;
+			break;
+
+		default:
+			//std::cout << "\n Invalid Operator: "<<op<<std::endl;
+			/*_getch();*/
+			return -1;
+			break;
+		}
+	}
+
+	static char correspondingOpeningBracket(char closingBracket)
+	{
+		switch (closingBracket)
+		{
+		case ')':
+			return '(';
+
+		case '}':
+			return '{';
+
+		case ']':
+			return '[';
+		}
 	}
 };
