@@ -1,6 +1,6 @@
-#include "stack.h"
+#include "stack_validity.h"
 
-int main()
+void main()
 {
 	Stack S;
 	_getch();
