@@ -11,12 +11,20 @@ class Stack
 {
 public:
 	char* _stack;
+	int* _intStack;
 	int _size;
 	int _index;
+	int _intIndex;
 	char _stackTop;
 
-	Stack() : _index(-1), _size(0)
+	Stack() : _index(-1), _intIndex(-1), _size(0)
 	{
+		system("cls");
+		std::cout << "\n Please set your command-window font size to 32 for best experience."
+			<< "\n\n Click Window Icon > Properties > Font > 32 > OK"
+			<< "\n Maximize window to Full Screen afterwards."
+			<< "\n\n Press any key once you're done. ";
+		_getch();
 		start();
 	}
 
@@ -24,9 +32,10 @@ public:
 	{
 		system("cls");
 		system("color 0a");
-		std::cout << "\n\n STACK-BASED ALGEBRAIC EXPRESSION ANALYZER\n";
-		std::cout << "              VERSION 2.0\n";
-		std::cout << "\n @SQ\n";
+		std::cout << "\n ^^^^^^^^^^^^^^^^^^^^^^^^^^ EVA - Expression Validity Analyzer ^^^^^^^^^^^^^^^^^^^^^^^^^";
+		std::cout << "\n                                       Version 2.1\n";
+		std::cout << "                                          @sqazi";
+		std::cout << "\n ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^";
 		std::cout << "\n Press 1 - 3: \n"
 			<< "\n 1 - Stack Operations"
 			<< "\n 2 - Expression validity check & Postfix Conversion"
@@ -59,10 +68,11 @@ public:
 		delete _stack;
 		_index = -1;
 		system("cls");
-		std::cout << "\n\n STACK IMPLEMENTATION \n";
-		std::cout << "     VERSION 2.0\n";
-		std::cout << "\n @SQ\n";
 		system("color 0a");
+		std::cout << "\n ^^^^^^^^^^^^^^^^^^^^^^^^^^ EVA - Expression Validity Analyzer ^^^^^^^^^^^^^^^^^^^^^^^^^";
+		std::cout << "\n                                       Version 2.1\n";
+		std::cout << "                                          @sqazi";
+		std::cout << "\n ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^";
 		std::cout << "\n Enter your desired stack size: ";
 		std::cin >> _size;
 		_stack = new char[_size];
@@ -73,9 +83,10 @@ public:
 	{
 		system("cls");
 		system("color 0a");
-		std::cout << "\n\n STACK IMPLEMENTATION\n";
-		std::cout << "      VERSION 2.0\n";
-		std::cout << "\n @SQ\n";
+		std::cout << "\n ^^^^^^^^^^^^^^^^^^^^^^^^^^ EVA - Expression Validity Analyzer ^^^^^^^^^^^^^^^^^^^^^^^^^";
+		std::cout << "\n                                       Version 2.3\n";
+		std::cout << "                                          @sqazi";
+		std::cout << "\n ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^";
 		std::cout << "\n Press 1 - 5: \n"
 			<< "\n 1 - Push an element onto the stack"
 			<< "\n 2 - Pop an element from the stack"
@@ -119,6 +130,7 @@ public:
 			stackFunctions();
 		}
 	}
+
 	void push(char x)
 	{
 		if (isFull())
@@ -148,18 +160,28 @@ public:
 		return popped;
 	}
 
-	char peek()
+	void pushInt(int x)
 	{
-		return _stackTop;
+		_intStack[++_intIndex] = x;
+		std::cout << "\n '" << x << "' pushed to stack. ";
+	}
+
+	int popInt()
+	{
+		int popped = _intStack[_intIndex];
+		_intStack[_intIndex] = 0;
+		std::cout << "\n '" << popped << "' popped from stack.";
+		return popped;
 	}
 
 	void expressionValidityCheck()
 	{
 		system("cls");
 		system("color 0a");
-		std::cout << "\n\n ALEBRAIC EXPRESSION VALIDITY ANALYZER \n";
-		std::cout << "              VERSION 2.0\n";
-		std::cout << "\n @SQ\n";
+		std::cout << "\n ^^^^^^^^^^^^^^^^^^^^^^^^^^ EVA - Expression Validity Analyzer ^^^^^^^^^^^^^^^^^^^^^^^^^";
+		std::cout << "\n                                       Version 2.1\n";
+		std::cout << "                                          @sqazi";
+		std::cout << "\n ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^";
 		/*	std::cin.clear();
 		std::string expression;*/
 
@@ -361,6 +383,8 @@ public:
 		_index = -1;
 		_size = size;
 		_stack = new char[_size];
+		_intStack = new int[_size];
+
 		int tempVal = 0;
 
 		for (int i = 0; i < _size; ++i)
@@ -377,6 +401,10 @@ public:
 					oprnd2 = pop();
 					oprnd1 = pop();
 					tempVal = evaluate(postFixExpression[i], oprnd1, oprnd2);
+					if (tempVal > 9)
+					{
+
+					}
 					push(intToChar(tempVal));
 				}
 			}
