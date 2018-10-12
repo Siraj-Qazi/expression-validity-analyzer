@@ -33,12 +33,12 @@ public:
 		system("cls");
 		system("color 0a");
 		std::cout << "\n ^^^^^^^^^^^^^^^^^^^^^^^^^^ EVA - Expression Validity Analyzer ^^^^^^^^^^^^^^^^^^^^^^^^^";
-		std::cout << "\n                                       Version 2.1\n";
+		std::cout << "\n                                       Version 2.2\n";
 		std::cout << "                                          @sqazi";
 		std::cout << "\n ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^";
 		std::cout << "\n Press 1 - 3: \n"
 			<< "\n 1 - Stack Operations"
-			<< "\n 2 - Expression validity check & Postfix Conversion"
+			<< "\n 2 - Expression Validity Check & Postfix Conversion & Evaluation"
 			<< "\n 3 - Exit\n ";
 
 		char choice = _getch();
@@ -70,7 +70,7 @@ public:
 		system("cls");
 		system("color 0a");
 		std::cout << "\n ^^^^^^^^^^^^^^^^^^^^^^^^^^ EVA - Expression Validity Analyzer ^^^^^^^^^^^^^^^^^^^^^^^^^";
-		std::cout << "\n                                       Version 2.1\n";
+		std::cout << "\n                                       Version 2.2\n";
 		std::cout << "                                          @sqazi";
 		std::cout << "\n ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^";
 		std::cout << "\n Enter your desired stack size: ";
@@ -84,7 +84,7 @@ public:
 		system("cls");
 		system("color 0a");
 		std::cout << "\n ^^^^^^^^^^^^^^^^^^^^^^^^^^ EVA - Expression Validity Analyzer ^^^^^^^^^^^^^^^^^^^^^^^^^";
-		std::cout << "\n                                       Version 2.3\n";
+		std::cout << "\n                                       Version 2.2\n";
 		std::cout << "                                          @sqazi";
 		std::cout << "\n ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^";
 		std::cout << "\n Press 1 - 5: \n"
@@ -179,7 +179,7 @@ public:
 		system("cls");
 		system("color 0a");
 		std::cout << "\n ^^^^^^^^^^^^^^^^^^^^^^^^^^ EVA - Expression Validity Analyzer ^^^^^^^^^^^^^^^^^^^^^^^^^";
-		std::cout << "\n                                       Version 2.1\n";
+		std::cout << "\n                                       Version 2.2\n";
 		std::cout << "                                          @sqazi";
 		std::cout << "\n ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^";
 		/*	std::cin.clear();
@@ -203,6 +203,11 @@ public:
 					std::cout << "\b \b";
 				}
 			}
+			
+			// Ignore arrow keys 
+			else if (c == -32 || c == 72 || c == 80 || c == 75 || c == 77)
+				c = _getch();
+				
 			else
 			{
 				expression[i++] = c;
@@ -217,6 +222,17 @@ public:
 		_size = i;
 		_stack = new char[_size];
 
+		// Say invalid if the first or last character is an operator
+		if (isOperator(expression[0]) || isOperator(expression[_size - 1]))
+		{
+			std::cout << "\n\n Entered expression was: \n " << expression;
+			std::cout << "\n\n Invalid Expression! <Incorrectly written expression>\n";
+			_getch();
+			start();
+		}
+
+		bool hasVariables = false;
+
 		for (int i = 0; i < _size; ++i)
 		{
 			if (!(isdigit(expression[i]) or isOpeningBrace(expression[i]) or isClosingBrace(expression[i]) or isValid(expression[i])))
@@ -226,12 +242,35 @@ public:
 				_getch();
 				start();
 			}
+
+			if (isalpha(expression[i]))
+				hasVariables = true;
 		}
 
 		for (int i = 0; i < _size; ++i)
 		{
 			if (isOpeningBrace(expression[i]))
-				push(expression[i]);
+			{
+				if (isOperator(expression[i + 1]))
+				{
+					std::cout << "\n\n Entered expression was: \n " << expression;
+					std::cout << "\n\n Invalid Expression! <Incorrect use of operators with brackets>\n";
+					_getch();
+					start();
+				}
+
+				else if (isClosingBrace(expression[i + 1]))
+				{
+					std::cout << "\n\n Entered expression was: \n " << expression;
+					std::cout << "\n\n Invalid Expression! <Empty brackets>\n";
+					_getch();
+					start();
+				}
+
+				else
+					push(expression[i]);
+			}
+				
 
 			else if (isClosingBrace(expression[i]) and !isEmpty())
 			{
@@ -254,14 +293,25 @@ public:
 				start();
 			}
 
+			if (isOperator(expression[i]))
+			{
+				if (isOperator(expression[i + 1]) || isOpeningBrace(expression[i + 1]) || isClosingBrace(expression[i + 1]))
+				{
+					std::cout << "\n\n Entered expression was: \n " << expression;
+					std::cout << "\n\n Invalid Expression! <Incorrect use of operators with/without brackets>\n";
+					_getch();
+					start();
+				}
+			}
 		}
 
+		
 		std::cout << "\n\n Entered expression was: \n " << expression;
+		std::cout << "\n\n ### This is a valid expression. ###\n\n";
 
-		if (isEmpty())
+		if (isEmpty() && !hasVariables)
 		{
 		time:
-			std::cout << "\n\n ### This is a valid expression. ###\n\n";
 			std::cout << "\n Press 1-2: \n"
 				<< "\n 1 - Proceed to convert this expression to postfix notation"
 				<< "\n 2 - Go to Main Menu\n\n";
@@ -284,6 +334,14 @@ public:
 
 			start();
 		}
+
+		else if (isEmpty() && hasVariables)
+		{
+			std::cout << "\n This expression contains variables and thus cannot be evaluated.\n ";
+			_getch();
+			start();
+		}
+
 		else
 		{
 			std::cout << "\n Invalid Expression! \n";
@@ -401,10 +459,6 @@ public:
 					oprnd2 = pop();
 					oprnd1 = pop();
 					tempVal = evaluate(postFixExpression[i], oprnd1, oprnd2);
-					if (tempVal > 9)
-					{
-
-					}
 					push(intToChar(tempVal));
 				}
 			}
