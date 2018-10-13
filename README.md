@@ -40,3 +40,11 @@ Oct 13, 2018 12:03PM PST
    - Handled more incorrect inputs
    - Better Memory Management : Stacks are deleted after usage to free memory
    - Bug Fixes
+   
+Build 3.1:
+Oct 13, 2018 2:04PM PST
+
+   - Feature 'downdate'? Removed the stack operations function: Using basic
+     stack functions has been removed.
+   - Now purely an expression-validity-analyzer
+
