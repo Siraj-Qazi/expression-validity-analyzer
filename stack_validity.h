@@ -46,105 +46,27 @@ public:
 		system("cls");
 		system("color 0a");
 		std::cout << "\n ^^^^^^^^^^^^^^^^^^^^^^^^^^ EVA - Expression Validity Analyzer ^^^^^^^^^^^^^^^^^^^^^^^^^";
-		std::cout << "\n                                       Version 3.0\n";
+		std::cout << "\n                                       Version 3.1\n";
 		std::cout << "                                          @sqazi";
 		std::cout << "\n ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^";
-		std::cout << "\n Press 1 - 3: \n"
-			<< "\n 1 - Stack Operations"
-			<< "\n 2 - Expression Validity Check & Postfix Conversion & Evaluation"
-			<< "\n 3 - Exit\n ";
+		std::cout << "\n Press 1 - 2: \n"
+			<< "\n 1 - Expression Validity Check & Postfix Conversion & Evaluation"
+			<< "\n 2 - Exit\n ";
 
 		char choice = _getch();
 		switch (choice)
 		{
 		case '1':
-			createStack();
-			break;
-
-		case '2':
 			expressionValidityCheck();
 			break;
 
-		case '3':
-			exit(0);
-
-		default:
-			std::cout << "\n Press 1-3 Only. <PRESS ANY KEY> ";
-			_getch();
-			start();
-		}
-	}
-
-	void createStack()
-	{
-		if (_stack)
-		{
-			delete _stack;
-			_stack = NULL;
-		}
-			
-		_index = -1;
-		system("cls");
-		system("color 0a");
-		std::cout << "\n ^^^^^^^^^^^^^^^^^^^^^^^^^^ EVA - Expression Validity Analyzer ^^^^^^^^^^^^^^^^^^^^^^^^^";
-		std::cout << "\n                                       Version 3.0\n";
-		std::cout << "                                          @sqazi";
-		std::cout << "\n ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^";
-		std::cout << "\n Enter your desired stack size: ";
-		std::cin >> _size;
-		_stack = new char[_size];
-		stackFunctions();
-	}
-
-	void stackFunctions()
-	{
-		system("cls");
-		system("color 0a");
-		std::cout << "\n ^^^^^^^^^^^^^^^^^^^^^^^^^^ EVA - Expression Validity Analyzer ^^^^^^^^^^^^^^^^^^^^^^^^^";
-		std::cout << "\n                                       Version 3.0\n";
-		std::cout << "                                          @sqazi";
-		std::cout << "\n ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^";
-		std::cout << "\n Press 1 - 5: \n"
-			<< "\n 1 - Push an element onto the stack"
-			<< "\n 2 - Pop an element from the stack"
-			<< "\n 3 - Create new stack"
-			<< "\n 4 - Return to Main Menu"
-			<< "\n 5 - Exit\n ";
-
-		char input;
-		char popped;
-		char choice = _getch();
-		switch (choice)
-		{
-		case '1':
-			std::cout << "\n\n Enter the value to push onto the stack: ";
-			std::cin >> input;
-			push(input);
-			Sleep(1000);
-			stackFunctions();
-			break;
-
 		case '2':
-			popped = pop();
-			Sleep(1000);
-			stackFunctions();
-			break;
-
-		case '3':
-			createStack();
-			break;
-
-		case '4':
-			start();
-			break;
-
-		case '5':
 			exit(0);
 
 		default:
-			std::cout << "\n Please press 1-5 only. <PRESS ANY KEY> ";
+			std::cout << "\n Press 1-2 Only. <PRESS ANY KEY> ";
 			_getch();
-			stackFunctions();
+			start();
 		}
 	}
 
@@ -154,7 +76,7 @@ public:
 		{
 			std::cout << "\n Error! The stack is full. \n";
 			_getch();
-			stackFunctions();
+			start();
 		}
 		_stackTop = _stack[++_index] = x;
 		std::cout << "\n '" << x << "' pushed to stack. ";
@@ -166,7 +88,7 @@ public:
 		{
 			std::cout << "\n Error! The stack is Empty. \n";
 			_getch();
-			stackFunctions();
+			start();
 		}
 		char popped = _stack[_index];
 		_stack[_index--] = '0';
@@ -194,7 +116,7 @@ public:
 		system("cls");
 		system("color 0a");
 		std::cout << "\n ^^^^^^^^^^^^^^^^^^^^^^^^^^ EVA - Expression Validity Analyzer ^^^^^^^^^^^^^^^^^^^^^^^^^";
-		std::cout << "\n                                       Version 3.0\n";
+		std::cout << "\n                                       Version 3.1\n";
 		std::cout << "                                          @sqazi";
 		std::cout << "\n ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^";
 
@@ -303,7 +225,6 @@ public:
 					push(expression[i]);
 			}
 				
-
 			else if (isClosingBrace(expression[i]) and !isEmpty())
 			{
 				if (!isCorrespondingOpeningBrace(expression[i], _stack[_index]))
@@ -663,7 +584,7 @@ public:
 
 	static bool isValid(char x)
 	{
-		return isalpha(x) or x == '+' or x == '-' or x == '*' or x == '/'; // or x == '!' or x == '<' or x == '>' or x == '.';
+		return isalpha(x) or isOperator(x); // or x == '!' or x == '<' or x == '>' or x == '.';
 	}
 
 	static bool isCorrespondingOpeningBrace(char test, char corresponding)
