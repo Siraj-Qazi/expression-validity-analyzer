@@ -1,5 +1,5 @@
 # expression-validity-analyzer
-A Stack-based algebraic expression validity analyzer and infix to postfix converterin C++
+A Stack-based algebraic expression validity analyzer and infix to postfix converter in C++
 
 EVA - Expression Validity Analyzer
 By Siraj Qazi
