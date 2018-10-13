@@ -1,23 +1,36 @@
 #pragma once
 #include <iostream>
 #include <string>
+#include <cctype>
 #include <conio.h>
 #include <Windows.h>
-#include <cctype>
+#include <stdlib.h>
 #define and &&
 #define or ||
 
 class Stack
 {
 public:
-	char* _stack;
-	int* _intStack;
 	int _size;
-	int _index;
-	int _intIndex;
-	char _stackTop;
+	bool _hasVariables;
 
-	Stack() : _index(-1), _intIndex(-1), _size(0)
+	// Character Stack
+	char* _stack;
+	int _index;
+	char _stackTop;
+	
+	// Integer Stack
+	int* _intStack;
+	int _intIndex;
+	int _stackTopInt;
+
+	Stack() :
+		_stack(NULL),
+		_intStack(NULL),
+		_index(-1), 
+		_intIndex(-1), 
+		_size(0), 
+		_hasVariables(false)
 	{
 		system("cls");
 		std::cout << "\n Please set your command-window font size to 32 for best experience."
@@ -33,7 +46,7 @@ public:
 		system("cls");
 		system("color 0a");
 		std::cout << "\n ^^^^^^^^^^^^^^^^^^^^^^^^^^ EVA - Expression Validity Analyzer ^^^^^^^^^^^^^^^^^^^^^^^^^";
-		std::cout << "\n                                       Version 2.2\n";
+		std::cout << "\n                                       Version 3.0\n";
 		std::cout << "                                          @sqazi";
 		std::cout << "\n ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^";
 		std::cout << "\n Press 1 - 3: \n"
@@ -59,18 +72,22 @@ public:
 			std::cout << "\n Press 1-3 Only. <PRESS ANY KEY> ";
 			_getch();
 			start();
-
 		}
 	}
 
 	void createStack()
 	{
-		delete _stack;
+		if (_stack)
+		{
+			delete _stack;
+			_stack = NULL;
+		}
+			
 		_index = -1;
 		system("cls");
 		system("color 0a");
 		std::cout << "\n ^^^^^^^^^^^^^^^^^^^^^^^^^^ EVA - Expression Validity Analyzer ^^^^^^^^^^^^^^^^^^^^^^^^^";
-		std::cout << "\n                                       Version 2.2\n";
+		std::cout << "\n                                       Version 3.0\n";
 		std::cout << "                                          @sqazi";
 		std::cout << "\n ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^";
 		std::cout << "\n Enter your desired stack size: ";
@@ -84,7 +101,7 @@ public:
 		system("cls");
 		system("color 0a");
 		std::cout << "\n ^^^^^^^^^^^^^^^^^^^^^^^^^^ EVA - Expression Validity Analyzer ^^^^^^^^^^^^^^^^^^^^^^^^^";
-		std::cout << "\n                                       Version 2.2\n";
+		std::cout << "\n                                       Version 3.0\n";
 		std::cout << "                                          @sqazi";
 		std::cout << "\n ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^";
 		std::cout << "\n Press 1 - 5: \n"
@@ -139,7 +156,6 @@ public:
 			_getch();
 			stackFunctions();
 		}
-
 		_stackTop = _stack[++_index] = x;
 		std::cout << "\n '" << x << "' pushed to stack. ";
 	}
@@ -152,7 +168,6 @@ public:
 			_getch();
 			stackFunctions();
 		}
-
 		char popped = _stack[_index];
 		_stack[_index--] = '0';
 		_stackTop = _stack[_index];
@@ -169,7 +184,7 @@ public:
 	int popInt()
 	{
 		int popped = _intStack[_intIndex];
-		_intStack[_intIndex] = 0;
+		_intStack[_intIndex--] = 0;
 		std::cout << "\n '" << popped << "' popped from stack.";
 		return popped;
 	}
@@ -179,15 +194,12 @@ public:
 		system("cls");
 		system("color 0a");
 		std::cout << "\n ^^^^^^^^^^^^^^^^^^^^^^^^^^ EVA - Expression Validity Analyzer ^^^^^^^^^^^^^^^^^^^^^^^^^";
-		std::cout << "\n                                       Version 2.2\n";
+		std::cout << "\n                                       Version 3.0\n";
 		std::cout << "                                          @sqazi";
 		std::cout << "\n ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^";
-		/*	std::cin.clear();
-		std::string expression;*/
 
 		char* expression = new char[100];
 		std::cout << "\n Enter the expression to test:\n ";
-		/*std::getline(std::cin, expression);*/
 
 		// #The _getch() input loop
 		int i = 0;
@@ -217,7 +229,13 @@ public:
 		}
 		expression[i] = '\0';
 
-		delete _stack;
+		if (_stack)
+		{
+			delete _stack;
+			_stack = NULL;
+			_hasVariables = false;
+		}
+			
 		_index = -1;
 		_size = i;
 		_stack = new char[_size];
@@ -231,20 +249,34 @@ public:
 			start();
 		}
 
-		bool hasVariables = false;
-
 		for (int i = 0; i < _size; ++i)
 		{
 			if (!(isdigit(expression[i]) or isOpeningBrace(expression[i]) or isClosingBrace(expression[i]) or isValid(expression[i])))
 			{
 				std::cout << "\n\n Entered expression was: \n " << expression;
-				std::cout << "\n\n Invalid Expression! <Contains an invalid character>\n";
+				std::cout << "\n\n Invalid Expression! <Contains an invalid character: '"<<expression[i]<<"' >\n";
+				_getch();
+				start();
+			}
+
+			if (isalnum(expression[i]) && isOpeningBrace(expression[i + 1]))
+			{
+				std::cout << "\n\n Entered expression was: \n " << expression;
+				std::cout << "\n\nInvalid! <Please use x * (y) instead of x(y) >\n";
+				_getch();
+				start();
+			}
+
+			else if (isClosingBrace(expression[i]) && isalnum(expression[i+1]))
+			{
+				std::cout << "\n\n Entered expression was: \n " << expression;
+				std::cout << "\n\n Invalid! <Please use (x) * y instead of (x)y >\n";
 				_getch();
 				start();
 			}
 
 			if (isalpha(expression[i]))
-				hasVariables = true;
+				_hasVariables = true;
 		}
 
 		for (int i = 0; i < _size; ++i)
@@ -295,7 +327,7 @@ public:
 
 			if (isOperator(expression[i]))
 			{
-				if (isOperator(expression[i + 1]) || isOpeningBrace(expression[i + 1]) || isClosingBrace(expression[i + 1]))
+				if (isOperator(expression[i + 1]) || isClosingBrace(expression[i + 1]))
 				{
 					std::cout << "\n\n Entered expression was: \n " << expression;
 					std::cout << "\n\n Invalid Expression! <Incorrect use of operators with/without brackets>\n";
@@ -305,12 +337,11 @@ public:
 			}
 		}
 
-		
 		std::cout << "\n\n Entered expression was: \n " << expression;
-		std::cout << "\n\n ### This is a valid expression. ###\n\n";
-
-		if (isEmpty() && !hasVariables)
+		
+		if (isEmpty())
 		{
+			std::cout << "\n\n ### This is a valid expression. ###\n\n";
 		time:
 			std::cout << "\n Press 1-2: \n"
 				<< "\n 1 - Proceed to convert this expression to postfix notation"
@@ -331,17 +362,8 @@ public:
 				Sleep(1000);
 				goto time;
 			}
-
 			start();
 		}
-
-		else if (isEmpty() && hasVariables)
-		{
-			std::cout << "\n This expression contains variables and thus cannot be evaluated.\n ";
-			_getch();
-			start();
-		}
-
 		else
 		{
 			std::cout << "\n Invalid Expression! \n";
@@ -360,11 +382,16 @@ public:
 		std::cout << "\n";
 
 		// Delete any current stack in memory
-		delete _stack;
+		if (_stack)
+		{
+			delete _stack;
+			_stack = NULL;
+		}
+
 		_index = -1;
 		_size = size;
 		_stack = new char[_size];
-		char* postFix = new char[_size];
+		char* postFix = new char[_size*2];
 
 		// The beautiful part
 		int j = 0;
@@ -374,13 +401,28 @@ public:
 				push(expression[i]);
 
 			else if (isalnum(expression[i]))
-				postFix[j++] = expression[i];
+			{
+				char* multiDigit = new char[10];
+				int k = 0;
+				while (isalnum(expression[i]))
+					multiDigit[k++] = expression[i++];
 
+				for (int z = 0; z < k; ++z)
+					postFix[j++] = multiDigit[z];
+
+				postFix[j++] = ' ';
+
+				--i;    // Decrement i so that the main for-loop's ++i sets it right again
+			}
+				
 			else if (isOperator(expression[i]))
 			{
 				while (precedenceOf(_stackTop) >= precedenceOf(expression[i]) and !isEmpty())
 					if (!isOpeningBrace(_stackTop))
+					{
 						postFix[j++] = pop();
+						postFix[j++] = ' ';
+					}
 					else
 						pop();
 
@@ -390,14 +432,21 @@ public:
 			else if (isClosingBrace(expression[i]) and !isEmpty())
 			{
 				while (_stackTop != correspondingOpeningBracket(expression[i]) and !isEmpty())
+				{
 					postFix[j++] = pop();
+					postFix[j++] = ' ';
+
+				}
 				pop();         // Pop the last opening bracket from the _stack
 			}
 		}
 
-		while (!isEmpty())
-			postFix[j++] = pop();       // append any remaining operators/literals to the postFix
-
+		while (!isEmpty())  // append any remaining operators/literals to the postFix
+		{
+			postFix[j++] = pop(); 
+			postFix[j++] = ' ';
+		}
+			       
 		postFix[j] = '\0';             // Null-Terminate the postFix char* array
 		int postFixSize = j;
 
@@ -411,6 +460,20 @@ public:
 
 		for (int i = 0; i < postFixSize + 2; ++i)
 			std::cout << "-";
+		
+		if (_hasVariables)
+		{
+			std::cout << "\n This expression contains variables and thus cannot be evaluated.\n ";
+			_getch();
+			_hasVariables = false;
+			start();
+		}
+
+		if (_stack)
+		{
+			delete _stack;  // Release memory
+			_stack = NULL;
+		}
 
 	time2:
 		std::cout << "\n\n Press 1-2: \n"
@@ -437,10 +500,14 @@ public:
 	void evaluatePostFix(char* postFixExpression, int size)
 	{
 		// Delete any current stack in memory
-		delete _stack;
-		_index = -1;
+		if (_intStack)
+		{
+			delete _intStack;
+			_intStack = NULL;
+		}
+		
+		_intIndex = -1;
 		_size = size;
-		_stack = new char[_size];
 		_intStack = new int[_size];
 
 		int tempVal = 0;
@@ -448,29 +515,44 @@ public:
 		for (int i = 0; i < _size; ++i)
 		{
 			if (isdigit(postFixExpression[i]))
-				push(postFixExpression[i]);
-
+			{
+				char* multiDigit = new char[10];
+				int k = 0;
+				while (isdigit(postFixExpression[i]))
+					multiDigit[k++] = postFixExpression[i++];
+	
+				int tempVal = atoi(multiDigit);
+				pushInt(tempVal);
+			}
+				
 			else if (isOperator(postFixExpression[i]))
 			{
-				char oprnd1;
-				char oprnd2;
-				if (!isEmpty())
+				int oprnd1;
+				int oprnd2;
+				if (!isEmptyInt())
 				{
-					oprnd2 = pop();
-					oprnd1 = pop();
-					tempVal = evaluate(postFixExpression[i], oprnd1, oprnd2);
-					push(intToChar(tempVal));
+					oprnd2 = popInt();
+					oprnd1 = popInt();
+					tempVal = evaluateInt(postFixExpression[i], oprnd1, oprnd2);
+					pushInt(tempVal);
 				}
 			}
 		}
 
-		tempVal = charToInt(pop());
-		if (isEmpty())
+		tempVal = popInt();
+
+		if (isEmptyInt())
 			std::cout << "\n Going Fine";
 		else
-			std::cout << "\n Something messedup";
+			std::cout << "\n Something messed up";
 
-		std::cout << "\n\n The result of this postfix expression is " << tempVal;
+		std::cout << "\n\n The result of this postfix expression is " << tempVal << " ";
+
+		if (_intStack)
+		{
+			delete _intStack;
+			_intStack = NULL;
+		}
 		_getch();
 	}
 
@@ -504,6 +586,36 @@ public:
 		}
 	}
 
+	int evaluateInt(char oprtr, int oprnd1, int oprnd2)
+	{
+		switch (oprtr)
+		{
+		case '+':
+			return oprnd1 + oprnd2;
+
+		case '-':
+			return oprnd1 - oprnd2;
+
+		case '*':
+			return oprnd1 * oprnd2;
+
+		case '/':
+			if (oprnd2 != 0)
+				return oprnd1 / oprnd2;
+			else
+			{
+				std::cout << "\n\n !!! MATH ERROR !!!\n";
+				_getch();
+				expressionValidityCheck();
+			}
+			break;
+
+		default:
+			std::cout << "\n Invalid Operator: " << oprtr;
+			_getch();
+		}
+	}
+
 	int charToInt(char x)
 	{
 		return x - 48;
@@ -522,6 +634,16 @@ public:
 	bool isEmpty()
 	{
 		return _index == -1;
+	}
+
+	bool isEmptyInt()
+	{
+		return _intIndex == -1;
+	}
+
+	bool isFullInt()
+	{
+		return _intIndex == _size - 1;
 	}
 
 	static bool isOpeningBrace(char x)
