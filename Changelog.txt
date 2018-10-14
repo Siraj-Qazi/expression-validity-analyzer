@@ -45,4 +45,14 @@ Oct 13, 2018 2:04PM PST
      stack functions has been removed.
    - Now purely an expression-validity-analyzer
 
+Build 3.2:
+Oct 13, 2018 11:06PM PST
 
+   - Added Function receivePostFix( ) to directly input a post fix expression from user 
+     and evaluate it
+
+Build 3.3:
+Oct 14, 2018 1:18PM PST
+
+   - Added function receiveInfix( ) to take infix expression as input
+   - Now a new function _getchInputLoop( ) is called to take all inputs in the application. 
