@@ -56,3 +56,8 @@ Oct 14, 2018 1:18PM PST
 
    - Added function receiveInfix( ) to take infix expression as input
    - Now a new function _getchInputLoop( ) is called to take all inputs in the application. 
+
+Build 3.3X:
+Oct 14, 2018 3:20PM PST
+
+  - Extended the range of calculations

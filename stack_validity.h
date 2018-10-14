@@ -20,9 +20,9 @@ public:
 	char _stackTop;
 	
 	// Integer Stack
-	int* _intStack;
+	long long int* _intStack;
 	int _intIndex;
-	int _stackTopInt;
+	long long int _stackTopInt;
 
 	Stack() :
 		_stack(NULL),
@@ -46,7 +46,7 @@ public:
 		system("cls");
 		system("color 0b");
 		std::cout << "\n ^^^^^^^^^^^^^^^^^^^^^^^^^^ EVA - Expression Validity Analyzer ^^^^^^^^^^^^^^^^^^^^^^^^^";
-		std::cout << "\n                                       Version 3.3\n";
+		std::cout << "\n                                       Version 3.3X\n";
 		std::cout << "                                          @sqazi";
 		std::cout << "\n ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^";
 		std::cout << "\n Press 1 - 3: \n"
@@ -102,11 +102,11 @@ public:
 		return popped;
 	}
 
-	void pushInt(int x)
+	void pushInt(long long int x)
 	{
 		if (!isFullInt())
 		{
-			_intStack[++_intIndex] = x;
+			_stackTopInt = _intStack[++_intIndex] = x;
 			std::cout << "\n '" << x << "'     pushed to stack. ";
 		}
 		else
@@ -117,11 +117,11 @@ public:
 		}
 	}
 
-	int popInt()
+	long long int popInt()
 	{
 		if (!isEmptyInt())
 		{
-			int popped = _intStack[_intIndex];
+			long long int popped = _intStack[_intIndex];
 			_intStack[_intIndex--] = 0;
 			std::cout << "\n '" << popped << "'     popped from stack.";
 			return popped;
@@ -139,7 +139,7 @@ public:
 		system("cls");
 		system("color 0a");
 		std::cout << "\n ^^^^^^^^^^^^^^^^^^^^^^^^^^ EVA - Expression Validity Analyzer ^^^^^^^^^^^^^^^^^^^^^^^^^";
-		std::cout << "\n                                       Version 3.3\n";
+		std::cout << "\n                                       Version 3.3X\n";
 		std::cout << "                                          @sqazi";
 		std::cout << "\n ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^";
 
@@ -314,7 +314,7 @@ public:
 
 			else if (isalnum(expression[i]))
 			{
-				char* multiDigit = new char[20];
+				char* multiDigit = new char[100];
 				int k = 0;
 				while (isalnum(expression[i]))
 					multiDigit[k++] = expression[i++];
@@ -426,32 +426,35 @@ public:
 		
 		_intIndex = -1;
 		_size = size;
-		_intStack = new int[_size];
+		_intStack = new long long int[_size];
 
-		int tempVal = 0;
+		long long int tempVal = 0;
 
 		for (int i = 0; i < _size; ++i)
 		{
 			if (isdigit(postFixExpression[i]))
 			{
-				char* multiDigit = new char[10];
+				char* multiDigit = new char[100];
 				int k = 0;
 				while (isdigit(postFixExpression[i]))
 					multiDigit[k++] = postFixExpression[i++];
 	
-				int tempVal = atoi(multiDigit);
+				long long int tempVal = atoll(multiDigit);
 				pushInt(tempVal);
 			}
 				
 			else if (isOperator(postFixExpression[i]))
 			{
-				int oprnd1;
-				int oprnd2;
+				long long int oprnd1;
+				long long int oprnd2;
 				if (!isEmptyInt())
 				{
 					oprnd2 = popInt();
 					oprnd1 = popInt();
-					tempVal = evaluateInt(postFixExpression[i], oprnd1, oprnd2);
+
+					std::cout << "\n Operator Applied: " << postFixExpression[i] << std::endl;
+
+					tempVal = evaluate(postFixExpression[i], oprnd1, oprnd2);
 					pushInt(tempVal);
 				}
 			}
@@ -480,7 +483,7 @@ public:
 		system("cls");
 		system("color 0a");
 		std::cout << "\n ^^^^^^^^^^^^^^^^^^^^^^^^^^ EVA - Expression Validity Analyzer ^^^^^^^^^^^^^^^^^^^^^^^^^";
-		std::cout << "\n                                       Version 3.3\n";
+		std::cout << "\n                                       Version 3.3X\n";
 		std::cout << "                                          @sqazi";
 		std::cout << "\n ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^";
 
@@ -500,7 +503,7 @@ public:
 		system("cls");
 		system("color 0a");
 		std::cout << "\n ^^^^^^^^^^^^^^^^^^^^^^^^^^ EVA - Expression Validity Analyzer ^^^^^^^^^^^^^^^^^^^^^^^^^";
-		std::cout << "\n                                       Version 3.3\n";
+		std::cout << "\n                                       Version 3.3X\n";
 		std::cout << "                                          @sqazi";
 		std::cout << "\n ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^";
 
@@ -553,37 +556,7 @@ public:
 		*size = i;
 	}
 
-	int evaluate(char oprtr, char oprnd1, char oprnd2)
-	{
-		switch (oprtr)
-		{
-		case '+':
-			return charToInt(oprnd1) + charToInt(oprnd2);
-
-		case '-':
-			return charToInt(oprnd1) - charToInt(oprnd2);
-
-		case '*':
-			return charToInt(oprnd1) * charToInt(oprnd2);
-
-		case '/':
-			if (charToInt(oprnd2) != 0)
-				return charToInt(oprnd1) / charToInt(oprnd2);
-			else
-			{
-				std::cout << "\n\n !!! MATH ERROR !!!\n";
-				_getch();
-				start();
-			}
-			break;
-
-		default:
-			std::cout << "\n Invalid Operator: " << oprtr;
-			_getch();
-		}
-	}
-
-	int evaluateInt(char oprtr, int oprnd1, int oprnd2)
+	long long int evaluate(char oprtr, long long int oprnd1, long long int oprnd2)
 	{
 		switch (oprtr)
 		{
