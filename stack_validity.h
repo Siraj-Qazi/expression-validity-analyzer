@@ -33,7 +33,7 @@ public:
 		_hasVariables(false)
 	{
 		system("cls");
-		std::cout << "\n Please set your command-window font size to 32 for best experience."
+		std::cout << "\n Please set your command-window font size to 30 for best experience."
 			<< "\n\n Click Window Icon > Properties > Font > 32 > OK"
 			<< "\n Maximize window to Full Screen afterwards."
 			<< "\n\n Press any key once you're done. ";
@@ -44,23 +44,28 @@ public:
 	void start()
 	{
 		system("cls");
-		system("color 0a");
+		system("color 0b");
 		std::cout << "\n ^^^^^^^^^^^^^^^^^^^^^^^^^^ EVA - Expression Validity Analyzer ^^^^^^^^^^^^^^^^^^^^^^^^^";
-		std::cout << "\n                                       Version 3.1\n";
+		std::cout << "\n                                       Version 3.3\n";
 		std::cout << "                                          @sqazi";
 		std::cout << "\n ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^";
-		std::cout << "\n Press 1 - 2: \n"
+		std::cout << "\n Press 1 - 3: \n"
 			<< "\n 1 - Expression Validity Check & Postfix Conversion & Evaluation"
-			<< "\n 2 - Exit\n ";
+			<< "\n 2 - Evaluate a post-fix expression"
+			<< "\n 3 - Exit\n ";
 
 		char choice = _getch();
 		switch (choice)
 		{
 		case '1':
-			expressionValidityCheck();
+			receiveInfix();
 			break;
 
 		case '2':
+			receivePostFix();
+			break;
+
+		case '3':
 			exit(0);
 
 		default:
@@ -79,7 +84,7 @@ public:
 			start();
 		}
 		_stackTop = _stack[++_index] = x;
-		std::cout << "\n '" << x << "' pushed to stack. ";
+		std::cout << "\n '" << x << "'     pushed to stack. ";
 	}
 
 	char pop()
@@ -93,63 +98,50 @@ public:
 		char popped = _stack[_index];
 		_stack[_index--] = '0';
 		_stackTop = _stack[_index];
-		std::cout << "\n '" << popped << "' popped from stack.";
+		std::cout << "\n '" << popped << "'     popped from stack.";
 		return popped;
 	}
 
 	void pushInt(int x)
 	{
-		_intStack[++_intIndex] = x;
-		std::cout << "\n '" << x << "' pushed to stack. ";
+		if (!isFullInt())
+		{
+			_intStack[++_intIndex] = x;
+			std::cout << "\n '" << x << "'     pushed to stack. ";
+		}
+		else
+		{
+			std::cout << "\n Error! The stack is Full. \n";
+			_getch();
+			start();
+		}
 	}
 
 	int popInt()
 	{
-		int popped = _intStack[_intIndex];
-		_intStack[_intIndex--] = 0;
-		std::cout << "\n '" << popped << "' popped from stack.";
-		return popped;
+		if (!isEmptyInt())
+		{
+			int popped = _intStack[_intIndex];
+			_intStack[_intIndex--] = 0;
+			std::cout << "\n '" << popped << "'     popped from stack.";
+			return popped;
+		}
+		else
+		{
+			std::cout << "\n Error! The stack is Empty. \n";
+			_getch();
+			start();
+		}
 	}
 
-	void expressionValidityCheck()
+	void expressionValidityCheck(char* expression, int size)
 	{
 		system("cls");
 		system("color 0a");
 		std::cout << "\n ^^^^^^^^^^^^^^^^^^^^^^^^^^ EVA - Expression Validity Analyzer ^^^^^^^^^^^^^^^^^^^^^^^^^";
-		std::cout << "\n                                       Version 3.1\n";
+		std::cout << "\n                                       Version 3.3\n";
 		std::cout << "                                          @sqazi";
 		std::cout << "\n ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^";
-
-		char* expression = new char[100];
-		std::cout << "\n Enter the expression to test:\n ";
-
-		// #The _getch() input loop
-		int i = 0;
-		char c = _getch();
-		while (c != 13)
-		{
-			if (c == 8)  // Allow Backspace for erasing characters
-			{
-				if (i == 0);  // Do nothing
-				else
-				{
-					expression[--i] = '\0';
-					std::cout << "\b \b";
-				}
-			}
-			
-			// Ignore arrow keys 
-			else if (c == -32 || c == 72 || c == 80 || c == 75 || c == 77)
-				c = _getch();
-				
-			else
-			{
-				expression[i++] = c;
-				std::cout << c;
-			}
-			c = _getch();
-		}
-		expression[i] = '\0';
 
 		if (_stack)
 		{
@@ -159,7 +151,7 @@ public:
 		}
 			
 		_index = -1;
-		_size = i;
+		_size = size;
 		_stack = new char[_size];
 
 		// Say invalid if the first or last character is an operator
@@ -287,7 +279,7 @@ public:
 		}
 		else
 		{
-			std::cout << "\n Invalid Expression! \n";
+			std::cout << "\n\n Invalid Expression! \n";
 			_getch();
 			start();
 		}
@@ -296,9 +288,8 @@ public:
 
 	void convertToPostFix(char* expression, int size)
 	{
-		system("cls");
 		system("color 0a");
-		std::cout << "\n\n Convert Infix to PostFix Notation - C++ \n";
+		std::cout << "\n\n EVA - Convert Infix to PostFix Notation\n";
 		std::cout << "\n @SQ\n";
 		std::cout << "\n";
 
@@ -323,7 +314,7 @@ public:
 
 			else if (isalnum(expression[i]))
 			{
-				char* multiDigit = new char[10];
+				char* multiDigit = new char[20];
 				int k = 0;
 				while (isalnum(expression[i]))
 					multiDigit[k++] = expression[i++];
@@ -332,6 +323,8 @@ public:
 					postFix[j++] = multiDigit[z];
 
 				postFix[j++] = ' ';
+
+				free(multiDigit);  // free multidigit
 
 				--i;    // Decrement i so that the main for-loop's ++i sets it right again
 			}
@@ -356,7 +349,6 @@ public:
 				{
 					postFix[j++] = pop();
 					postFix[j++] = ' ';
-
 				}
 				pop();         // Pop the last opening bracket from the _stack
 			}
@@ -420,6 +412,11 @@ public:
 
 	void evaluatePostFix(char* postFixExpression, int size)
 	{
+		system("color 0a");
+		std::cout << "\n\n EVA - Convert Infix to PostFix Notation\n";
+		std::cout << "\n @SQ\n";
+		std::cout << "\n";
+
 		// Delete any current stack in memory
 		if (_intStack)
 		{
@@ -463,18 +460,97 @@ public:
 		tempVal = popInt();
 
 		if (isEmptyInt())
+		{
 			std::cout << "\n Going Fine";
+			std::cout << "\n\n The result of this postfix expression is " << tempVal << " ";
+		}
 		else
-			std::cout << "\n Something messed up";
-
-		std::cout << "\n\n The result of this postfix expression is " << tempVal << " ";
-
+			std::cout << "\n\n Something messed up!\n Are you sure you separated each postFix entry with a space?\n";
+			
 		if (_intStack)
 		{
 			delete _intStack;
 			_intStack = NULL;
 		}
 		_getch();
+	}
+
+	void receiveInfix()
+	{
+		system("cls");
+		system("color 0a");
+		std::cout << "\n ^^^^^^^^^^^^^^^^^^^^^^^^^^ EVA - Expression Validity Analyzer ^^^^^^^^^^^^^^^^^^^^^^^^^";
+		std::cout << "\n                                       Version 3.3\n";
+		std::cout << "                                          @sqazi";
+		std::cout << "\n ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^";
+
+		char* expression = new char[100];
+		std::cout << "\n Enter the (infix) expression here.\n";
+		std::cout << "\n";
+
+		int expSize = 0;
+		_getchInputLoop(expression, &expSize);
+
+		expressionValidityCheck(expression, expSize);
+		start();
+	}
+
+	void receivePostFix()
+	{
+		system("cls");
+		system("color 0a");
+		std::cout << "\n ^^^^^^^^^^^^^^^^^^^^^^^^^^ EVA - Expression Validity Analyzer ^^^^^^^^^^^^^^^^^^^^^^^^^";
+		std::cout << "\n                                       Version 3.3\n";
+		std::cout << "                                          @sqazi";
+		std::cout << "\n ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^";
+
+		char* expression = new char[100];
+		std::cout << "\n Enter the post-fix expression here.\n"
+			<< " Note: Separate each entry with a space, e.g.\n"
+			<< "\n 23 47 * 51 -\n";
+
+		int expSize = 0;
+		_getchInputLoop(expression, &expSize);
+		
+		std::cout << "\n";
+
+		evaluatePostFix(expression, expSize);
+		start();
+	}
+
+	void _getchInputLoop(char* expression, int* size)
+	{
+		std::cout << "\n Input Expression> ";
+
+		// #The _getch() input loop
+		int i = 0;
+		char c = _getch();
+		while (c != 13)
+		{
+			if (c == 8)  // Allow Backspace for erasing characters
+			{
+				if (i == 0);  // Do nothing
+				else
+				{
+					expression[--i] = '\0';
+					std::cout << "\b \b";
+				}
+			}
+
+			// Ignore arrow keys 
+			else if (c == -32 || c == 72 || c == 80 || c == 75 || c == 77)
+				c = _getch();
+
+			else
+			{
+				expression[i++] = c;
+				std::cout << c;
+			}
+			c = _getch();
+		}
+
+		expression[i] = '\0';
+		*size = i;
 	}
 
 	int evaluate(char oprtr, char oprnd1, char oprnd2)
@@ -497,7 +573,7 @@ public:
 			{
 				std::cout << "\n\n !!! MATH ERROR !!!\n";
 				_getch();
-				expressionValidityCheck();
+				start();
 			}
 			break;
 
@@ -527,7 +603,7 @@ public:
 			{
 				std::cout << "\n\n !!! MATH ERROR !!!\n";
 				_getch();
-				expressionValidityCheck();
+				start();
 			}
 			break;
 
