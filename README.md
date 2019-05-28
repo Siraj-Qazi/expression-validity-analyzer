@@ -2,7 +2,6 @@
 A Stack-based algebraic expression validity analyzer and infix to postfix converter in C++
 
 EVA - Expression Validity Analyzer
-By Siraj Qazi
 -------------------------------------
 Changelog Updated on Oct 13, 2018
 
